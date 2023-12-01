@@ -4,36 +4,69 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"sort"
 	"strconv"
 	"strings"
 )
 
+var spellToDigitMap = make(map[string]int)
+
+func init() {
+	spellToDigitMap["one"] = 1
+	spellToDigitMap["two"] = 2
+	spellToDigitMap["three"] = 3
+	spellToDigitMap["four"] = 4
+	spellToDigitMap["five"] = 5
+	spellToDigitMap["six"] = 6
+	spellToDigitMap["seven"] = 7
+	spellToDigitMap["eight"] = 8
+	spellToDigitMap["nine"] = 9
+	spellToDigitMap["zero"] = 0
+}
+
 func getCV(s string) int {
-	var first int
-	var second int
-
-	for i := 0; i < len(s); i++ {
-		val, err := strconv.Atoi(string(s[i]))
-		if err == nil {
-			first = val
-			break
-		}
+	if s == "" {
+		return 0
 	}
-	for i := len(s) - 1; i >= 0; i-- {
-		val, err := strconv.Atoi(string(s[i]))
+
+	results := make(map[int]int)
+	// Get all single string digits into a map, with their indicies
+	for i, v := range s {
+		val, err := strconv.Atoi(string(v))
 		if err == nil {
-			second = val
-			break
+			results[i] = val
 		}
 	}
 
+	// Get all spelled out digits into a map, with their indicies
+	for k, v := range spellToDigitMap {
+		i := strings.Index(s, k)
+		if i != -1 {
+			results[i] = v
+		}
+		i = strings.LastIndex(s, k)
+		if i != -1 {
+			results[i] = v
+		}
+	}
+
+	// Sort the map keys, return the first value from first and last keys
+	keys := []int{}
+	for k := range results {
+		keys = append(keys, k)
+	}
+	sort.Ints(keys)
+	first := results[keys[0]]
+	second := results[keys[len(keys)-1]]
+
+	// Prepare and return results
 	var b strings.Builder
 	fmt.Fprintf(&b, "%d", first)
 	fmt.Fprintf(&b, "%d", second)
 	ns := b.String()
 	val, err := strconv.Atoi(ns)
 	if err != nil {
-		panic("")
+		panic(fmt.Sprintf("err: could not convert %v to an int", ns))
 	}
 	return val
 }
@@ -54,21 +87,20 @@ func getMultiLineStringFromFile(file *os.File) string {
 		fmt.Fprintf(&b, "%s\n", scanner.Text())
 	}
 	if err := scanner.Err(); err != nil {
-		panic("")
+		panic(fmt.Sprintf("err: scanning file error\n"))
 	}
 	return b.String()
 }
 
 func main() {
-	file, err := os.Open("in.dat")
+	filename := "in.dat"
+	file, err := os.Open(filename)
 	if err != nil {
-		panic("")
+		panic(fmt.Sprintf("err: error opening file %s\n", filename))
 	}
 	defer file.Close()
 
-	//fmt.Printf("allinput is: %s", allInput)
 	mls := getMultiLineStringFromFile(file)
 	sum := sumOfCVs(mls)
 	fmt.Printf("The correct summed calibration is: %d\n", sum)
 }
-

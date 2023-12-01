@@ -6,7 +6,6 @@ import (
 
 func TestGetCalibrationValue(t *testing.T) {
 	actual := getCV("1abc2")
-
 	want := 12
 	if actual != want {
 		t.Fatalf("wanted %d, got %d", want, actual)
@@ -43,6 +42,43 @@ func TestGetCalibrationValue(t *testing.T) {
 	}
 }
 
+func TestGetCalibrationValueWithSpelledOutDigits(t *testing.T) {
+	actual := getCV("two1nine")
+	want := 29
+	if actual != want {
+		t.Fatalf("wanted %d, got %d", want, actual)
+	}
+	actual = getCV("eightwothree")
+	want = 83
+	if actual != want {
+		t.Fatalf("wanted %d, got %d", want, actual)
+	}
+	actual = getCV("abcone2threexyz")
+	want = 13
+	if actual != want {
+		t.Fatalf("wanted %d, got %d", want, actual)
+	}
+	actual = getCV("xtwone3four")
+	want = 24
+	if actual != want {
+		t.Fatalf("wanted %d, got %d", want, actual)
+	}
+	actual = getCV("4nineeightseven2")
+	want = 42
+	if actual != want {
+		t.Fatalf("wanted %d, got %d", want, actual)
+	}
+	actual = getCV("zoneight234")
+	want = 14
+	if actual != want {
+		t.Fatalf("wanted %d, got %d", want, actual)
+	}
+	actual = getCV("7pqrstsixteen")
+	want = 76
+	if actual != want {
+		t.Fatalf("wanted %d, got %d", want, actual)
+	}
+}
 
 func TestSumOfCalibrationValues(t *testing.T) {
 	input := `1abc2
