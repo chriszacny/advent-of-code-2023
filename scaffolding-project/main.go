@@ -16,7 +16,9 @@ func getMultiLineStringFromFile(file *os.File) string {
 	if err := scanner.Err(); err != nil {
 		panic(fmt.Sprintf("err: scanning file error\n"))
 	}
-	return b.String()
+	toReturn := b.String()
+	toReturn = strings.TrimSuffix(toReturn, "\n")
+	return toReturn
 }
 
 func main() {
