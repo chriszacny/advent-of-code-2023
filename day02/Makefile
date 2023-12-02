@@ -18,7 +18,7 @@ clean:
 	rm -f $(BINARY_NAME)
 run: build format
 	./$(BINARY_NAME)
-format:
+fmt:
 	$(GOFMT) .
 
-.PHONY: all build test clean run format
+.PHONY: all build test clean run fmt

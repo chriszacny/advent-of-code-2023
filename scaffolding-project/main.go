@@ -7,6 +7,30 @@ import (
 	"strings"
 )
 
+
+/***********************************************************************************
+ * Struct Name: someStruct
+ *
+ * Description:
+ *   todo
+ *
+ * Usage:
+ *   todo
+ *
+ * Notes:
+ *   - todo
+ *
+ ***********************************************************************************/
+ type someStruct struct {
+	red   int
+	green int
+	blue  int
+}
+/***********************************************************************************
+ * End of someStruct
+ ***********************************************************************************/
+
+
 func getMultiLineStringFromFile(file *os.File) string {
 	var b strings.Builder
 	scanner := bufio.NewScanner(file)

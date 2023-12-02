@@ -4,6 +4,29 @@ import (
 	"testing"
 )
 
+func TestFewestNumPossibleCubesPerGame(t *testing.T) {
+	gr := gameRecord{id: 1}
+	gr.rounds = append(gr.rounds, gameRound{red: 2})
+	gr.rounds = append(gr.rounds, gameRound{red: 1, green: 3, blue: 2})
+	red, green, blue := fewestNumPossibleCubesPerGame(gr)
+
+	want := 2
+	actual := red
+	if want != actual {
+		t.Fatalf("wanted %d, got %d", want, actual)
+	}
+	want = 3
+	actual = green
+	if want != actual {
+		t.Fatalf("wanted %d, got %d", want, actual)
+	}
+	want = 2
+	actual = blue
+	if want != actual {
+		t.Fatalf("wanted %d, got %d", want, actual)
+	}
+}
+
 func TestGamesPossible(t *testing.T) {
 	puzzleInput := `1:3b,4r;1r,2g,6b;2g
 2:1b,2g;3g,4b,1r;1g,1b

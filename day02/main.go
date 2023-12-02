@@ -11,15 +11,6 @@ import (
 /***********************************************************************************
  * Struct Name: gameRound
  *
- * Description:
- *   todo
- *
- * Usage:
- *   todo
- *
- * Notes:
- *   - todo
- *
  ***********************************************************************************/
 type gameRound struct {
 	red   int
@@ -34,15 +25,6 @@ type gameRound struct {
 /***********************************************************************************
  * Struct Name: gameRecord
  *
- * Description:
- *   todo
- *
- * Usage:
- *   todo
- *
- * Notes:
- *   - todo
- *
  ***********************************************************************************/
 type gameRecord struct {
 	id     int
@@ -56,6 +38,36 @@ func (g *gameRecord) String() string {
 /***********************************************************************************
  * End of gameRecord
  ***********************************************************************************/
+
+func fewestNumPossibleCubesPerGame(game gameRecord) (int, int, int) {
+	red := 0
+	green := 0
+	blue := 0
+
+	for _, v := range game.rounds {
+		if v.red > red {
+			red = v.red
+		}
+		if v.green > green {
+			green = v.green
+		}
+		if v.blue > blue {
+			blue = v.blue
+		}
+	}
+
+	return red, green, blue
+}
+
+func getAllGames(puzzleInput string) []gameRecord {
+	toReturn := []gameRecord{}
+	gamesStr := strings.Split(puzzleInput, "\n")
+	for _, line := range gamesStr {
+		gr := parseGamesFileLine(line)
+		toReturn = append(toReturn, gr)
+	}
+	return toReturn
+}
 
 func gamesPossible(puzzleInput string, red int, green int, blue int) []gameRecord {
 	toReturn := []gameRecord{}
@@ -140,11 +152,25 @@ func main() {
 	}
 	defer file.Close()
 
+	// Part one
 	mls := getMultiLineStringFromFile(file)
+	red := 12
+	green := 13
+	blue := 14
 	gp := gamesPossible(mls, 12, 13, 14)
 	sum := 0
 	for _, v := range gp {
 		sum += v.id
 	}
-	fmt.Printf("sum is: %d\n", sum)
+	fmt.Printf("sum of possible games with cube count red: %d, green: %d, blue: %d, is: %d\n", red, green, blue, sum)
+
+	// Part two
+	allGames := getAllGames(mls)
+	sumOfPowers := 0
+	for _, v := range allGames {
+		minRed, minGreen, minBlue := fewestNumPossibleCubesPerGame(v)
+		power := minRed * minGreen * minBlue
+		sumOfPowers += power
+	}
+	fmt.Printf("sum of powers of min cube count is: %d\n", sumOfPowers)
 }
