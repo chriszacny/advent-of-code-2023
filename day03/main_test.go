@@ -2,7 +2,6 @@ package main
 
 import (
 	"testing"
-	"fmt"
 )
 
 var testin string = `
@@ -17,14 +16,31 @@ var testin string = `
 	...$.*....
 	.664.598..`
 
-func TestA(t *testing.T) {
-	fmt.Printf("%s", cleanIn(testin))
+func TestBasic(t *testing.T) {
+	testSimple := `
+	..42*
+	.....
+	5....
+	.$...
+	....3`
 
-	/*
-	want := 1
-	actual := 2
+	nums := getAllNums(testSimple)
+
+	want := 2
+	actual := len(nums)
 	if want != actual {
 		t.Fatalf("wanted %d, got %d", want, actual)
 	}
-	*/
+
+	want = 42
+	actual = nums[0]
+	if want != actual {
+		t.Fatalf("wanted %d, got %d", want, actual)
+	}
+
+	want = 5
+	actual = nums[1]
+	if want != actual {
+		t.Fatalf("wanted %d, got %d", want, actual)
+	}
 }
