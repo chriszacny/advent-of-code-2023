@@ -54,20 +54,6 @@ func (n *NumberCandidate) Int() int {
  * End of NumberCandidate
  ***********************************************************************************/
 
-/***********************************************************************************
- * Struct Name: GearData
- *
- ***********************************************************************************/
-type GearData struct {
-	value  Cell
-	numOne int
-	numTwo int
-}
-
-/***********************************************************************************
- * End of GearData
- ***********************************************************************************/
-
 func getValueType(s string) CellValueType {
 	// check if it is a number or a period
 	// else it is a symbol
@@ -106,35 +92,17 @@ func getNumberCands(matrix [][]Cell) []NumberCandidate {
 	return cands
 }
 
-func getGearData(matrix [][]Cell) []GearData {
-	data := []GearData{}
-	for i := 0; i < len(matrix); i++ {
-		for j := 0; j < len(matrix[i]); j++ {
-			if matrix[i][j].value == "*" {
-				// we now need to determine if it is bordered by two numbers AND only two numbers
-			}
-		}
-	}
-	return data
-}
-
-func main() {
-	// Boilerplate setup
-	in, file := getInput()
-	defer file.Close()
-
-	// Part one ///////////////////////
-	lines := strings.Split(in, "\n")
-
-	// build the matrix
+func buildMatrix(lines []string) [][]Cell {
 	rows := len(lines)
 	cols := len(lines[0])
 	matrix := make([][]Cell, rows)
 	for i := range matrix {
 		matrix[i] = make([]Cell, cols)
 	}
+	return matrix
+}
 
-	// Setup values
+func setupValues(rows int, cols int, lines []string, matrix [][]Cell) {
 	idct := 1
 	for i := 0; i < rows; i++ {
 		for j := 0; j < cols; j++ {
@@ -146,8 +114,9 @@ func main() {
 			idct++
 		}
 	}
+}
 
-	// Assign Edges
+func assignEdges(rows int, cols int, matrix [][]Cell) {
 	for i := 0; i < rows; i++ {
 		for j := 0; j < cols; j++ {
 			// Top Left
@@ -191,9 +160,29 @@ func main() {
 			}
 		}
 	}
+}
 
-	numberCands := getNumberCands(matrix)
+func buildGearPositions(adjacent []NumberCandidate) map[int][]NumberCandidate {
+	gearPositions := make(map[int][]NumberCandidate)
+	for _, n := range adjacent {
+		found := false
+		for _, v := range n.value {
+			for _, e := range v.edges {
+				if e.valueType == Symbol && e.value == "*" {
+					found = true
+					gearPositions[e.id] = append(gearPositions[e.id], n)
+					break
+				}
+			}
+			if found {
+				break
+			}
+		}
+	}
+	return gearPositions
+}
 
+func getNumbersAdjacentToSymbol(numberCands []NumberCandidate) []NumberCandidate {
 	validNumbers := []NumberCandidate{}
 	for _, c := range numberCands {
 		isValid := false
@@ -212,43 +201,50 @@ func main() {
 			validNumbers = append(validNumbers, c)
 		}
 	}
+	return validNumbers
+}
+
+func partOne(in string) (int, []NumberCandidate) {
+	lines := strings.Split(in, "\n")
+	matrix := buildMatrix(lines)
+	rows := len(matrix)
+	cols := len(matrix[0])
+
+	setupValues(rows, cols, lines, matrix)
+	assignEdges(rows, cols, matrix)
+	numberCands := getNumberCands(matrix)
+	adjacent := getNumbersAdjacentToSymbol(numberCands)
 
 	sum := 0
 
-	for _, vn := range validNumbers {
-		sum += vn.Int()
+	for _, a := range adjacent {
+		sum += a.Int()
 	}
+	return sum, adjacent
+}
 
-	fmt.Printf("sum of part 1 is: %d\n", sum)
-
-	// Part two ///////////////////////
-
-	gearPositions := make(map[int][]NumberCandidate)
-
-	for _, n := range validNumbers {
-		found := false
-		for _, v := range n.value {
-			for _, e := range v.edges {
-				if e.valueType == Symbol && e.value == "*" {
-					found = true
-					gearPositions[e.id] = append(gearPositions[e.id], n)
-					break
-				}
-			}
-			if found {
-				break
-			}
-		}
-	}
-
+func partTwo(adjacent []NumberCandidate) int {
+	gearPositions := buildGearPositions(adjacent)
 	sumGearRatios := 0
 	for k := range gearPositions {
 		if len(gearPositions[k]) == 2 {
-			fmt.Printf("%d\n", gearPositions[k][0].Int())
-			fmt.Printf("%d\n", gearPositions[k][1].Int())
 			gearRatio := gearPositions[k][0].Int() * gearPositions[k][1].Int()
 			sumGearRatios += gearRatio
 		}
 	}
-	fmt.Printf("sum of part 2 is: %d\n", sumGearRatios)
+	return sumGearRatios
+}
+
+func main() {
+	// Boilerplate setup
+	in, file := getInput()
+	defer file.Close()
+
+	// Part one ///////////////////////
+	p1, adjacent := partOne(in)
+	fmt.Printf("sum of part 1 is: %d\n", p1)
+
+	// Part two ///////////////////////
+	p2 := partTwo(adjacent)
+	fmt.Printf("sum of part 2 is: %d\n", p2)
 }

@@ -1,46 +1,32 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 )
 
-var testin string = `
-	467..114..
-	...*......
-	..35..633.
-	......#...
-	617*......
-	.....+.58.
-	..592.....
-	......755.
-	...$.*....
-	.664.598..`
-
 func TestBasic(t *testing.T) {
-	testSimple := `
-	..42*
-	.....
-	5....
-	.$...
-	....3`
+	in := `..42.
+...*.
+5..8.
+.$...
+....3`
 
-	nums := getAllNums(testSimple)
+	fmt.Printf("%s", in)
 
-	want := 2
-	actual := len(nums)
+	s1, adj := partOne(in)
+
+	want := 55
+	actual := s1
 	if want != actual {
 		t.Fatalf("wanted %d, got %d", want, actual)
 	}
 
-	want = 42
-	actual = nums[0]
+	s2 := partTwo(adj)
+	want = 336
+	actual = s2
 	if want != actual {
 		t.Fatalf("wanted %d, got %d", want, actual)
 	}
 
-	want = 5
-	actual = nums[1]
-	if want != actual {
-		t.Fatalf("wanted %d, got %d", want, actual)
-	}
 }
