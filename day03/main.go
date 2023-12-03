@@ -19,6 +19,7 @@ const (
  *
  ***********************************************************************************/
 type Cell struct {
+	id        int
 	value     string
 	valueType CellValueType
 	edges     []Cell
@@ -36,8 +37,35 @@ type NumberCandidate struct {
 	value []Cell
 }
 
+func (n *NumberCandidate) Int() int {
+	num := ""
+	for _, n := range n.value {
+		num += n.value
+	}
+	fullint, err := strconv.Atoi(num)
+	//fmt.Printf("%d\n", fullint)
+	if err != nil {
+		panic("")
+	}
+	return fullint
+}
+
 /***********************************************************************************
  * End of NumberCandidate
+ ***********************************************************************************/
+
+/***********************************************************************************
+ * Struct Name: GearData
+ *
+ ***********************************************************************************/
+type GearData struct {
+	value  Cell
+	numOne int
+	numTwo int
+}
+
+/***********************************************************************************
+ * End of GearData
  ***********************************************************************************/
 
 func getValueType(s string) CellValueType {
@@ -78,6 +106,18 @@ func getNumberCands(matrix [][]Cell) []NumberCandidate {
 	return cands
 }
 
+func getGearData(matrix [][]Cell) []GearData {
+	data := []GearData{}
+	for i := 0; i < len(matrix); i++ {
+		for j := 0; j < len(matrix[i]); j++ {
+			if matrix[i][j].value == "*" {
+				// we now need to determine if it is bordered by two numbers AND only two numbers
+			}
+		}
+	}
+	return data
+}
+
 func main() {
 	// Boilerplate setup
 	in, file := getInput()
@@ -95,12 +135,15 @@ func main() {
 	}
 
 	// Setup values
+	idct := 1
 	for i := 0; i < rows; i++ {
 		for j := 0; j < cols; j++ {
 			c := Cell{}
+			c.id = idct
 			c.value = string(lines[i][j])
 			c.valueType = getValueType(c.value)
 			matrix[i][j] = c
+			idct++
 		}
 	}
 
@@ -173,17 +216,39 @@ func main() {
 	sum := 0
 
 	for _, vn := range validNumbers {
-		num := ""
-		for _, n := range vn.value {
-			num += n.value
-		}
-		fullint, err := strconv.Atoi(num)
-		//fmt.Printf("%d\n", fullint)
-		if err != nil {
-			panic("")
-		}
-		sum += fullint
+		sum += vn.Int()
 	}
 
 	fmt.Printf("sum of part 1 is: %d\n", sum)
+
+	// Part two ///////////////////////
+
+	gearPositions := make(map[int][]NumberCandidate)
+
+	for _, n := range validNumbers {
+		found := false
+		for _, v := range n.value {
+			for _, e := range v.edges {
+				if e.valueType == Symbol && e.value == "*" {
+					found = true
+					gearPositions[e.id] = append(gearPositions[e.id], n)
+					break
+				}
+			}
+			if found {
+				break
+			}
+		}
+	}
+
+	sumGearRatios := 0
+	for k := range gearPositions {
+		if len(gearPositions[k]) == 2 {
+			fmt.Printf("%d\n", gearPositions[k][0].Int())
+			fmt.Printf("%d\n", gearPositions[k][1].Int())
+			gearRatio := gearPositions[k][0].Int() * gearPositions[k][1].Int()
+			sumGearRatios += gearRatio
+		}
+	}
+	fmt.Printf("sum of part 2 is: %d\n", sumGearRatios)
 }
