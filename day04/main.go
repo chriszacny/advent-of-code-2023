@@ -71,6 +71,16 @@ func (c *Card) Value() int {
 	return toReturn
 }
 
+func (c *Card) NumMatches() int {
+	toReturn := 0
+	for _, v := range c.winningNums {
+		if slices.Contains(c.ourNums, v) {
+			toReturn += 1
+		}
+	}
+	return toReturn
+}
+
 /***********************************************************************************
  * End of Card
  ***********************************************************************************/
@@ -80,15 +90,33 @@ func main() {
 	in, file := getInput()
 	defer file.Close()
 
+	cards := []Card{}
+	cardsWon := make(map[int]int)
+
 	// Part one ///////////////////////
 	sum := 0
 	lines := strings.Split(in, "\n")
 	for _, v := range lines {
 		c := NewCard(v)
+		cards = append(cards, *c)
+		cardsWon[c.id] = 1
 		sum += c.Value()
 	}
 
 	fmt.Printf("sum part 01: %d\n", sum)
 
 	// Part two ///////////////////////
+	countOfCards := 0
+	for _, c := range cards {
+		for i := 0; i < cardsWon[c.id]; i++ {
+			matches := c.NumMatches()
+			for j := c.id + 1; j < (c.id+1)+matches; j++ {
+				cardsWon[j] += 1
+			}
+		}
+	}
+	for k := range cardsWon {
+		countOfCards += cardsWon[k]
+	}
+	fmt.Printf("count from part 02: %d\n", countOfCards)
 }
